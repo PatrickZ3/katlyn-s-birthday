@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#12060a">
+<title>Merry Christmas, Katlyn</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #12060a;
+    --deep: #2a0a12;
+    --wine: #4a0d1c;
+    --red: #c4183a;
+    --gold: #f3c969;
+    --cream: #fff3e6;
+    --muted: #e9c9cf;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; height: 100%; }
+  body {
+    background: radial-gradient(ellipse at top, var(--wine) 0%, var(--deep) 45%, var(--bg) 100%) fixed;
+    background-color: var(--bg);
+    color: var(--cream);
+    font-family: "Nunito", system-ui, sans-serif;
+    overflow: hidden;
+    user-select: none;
+  }
+
+  /* ---------- sparkles + fairy lights ---------- */
+  #sparkles { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; }
+  .lights {
+    position: fixed; top: 0; left: 50%; transform: translateX(-50%);
+    width: 100%; max-width: 480px; height: 46px; z-index: 3; pointer-events: none;
+  }
+  .lights svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .bulb {
+    position: absolute; width: 10px; height: 15px; border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+    animation: twinkle 1.6s ease-in-out infinite alternate;
+  }
+  .bulb::before {
+    content: ""; position: absolute; top: -4px; left: 2px; width: 6px; height: 5px; background: #3b2a1a; border-radius: 2px;
+  }
+  @keyframes twinkle {
+    from { opacity: .35; filter: brightness(.7); }
+    to   { opacity: 1;  filter: brightness(1.3); }
+  }
+
+  /* ---------- layout ---------- */
+  #app {
+    position: relative; z-index: 2;
+    max-width: 480px; margin: 0 auto; height: 100dvh;
+    padding: 56px 16px calc(16px + env(safe-area-inset-bottom));
+  }
+  .screen { display: none; height: 100%; flex-direction: column; align-items: center; }
+  .screen.active { display: flex; animation: fadeIn .45s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+  .btn {
+    font: 800 1.1rem "Nunito", sans-serif; color: #fff;
+    background: linear-gradient(180deg, #e8334f, #a10f2c);
+    border: 2px solid var(--gold); border-radius: 999px;
+    padding: 14px 34px; cursor: pointer;
+    box-shadow: 0 0 22px rgba(232, 51, 79, .45), inset 0 2px 0 rgba(255,255,255,.25);
+    transition: transform .12s;
+  }
+  .btn:active { transform: scale(.95); }
+
+  /* ---------- burger menu ---------- */
+  .burger {
+    position: fixed; top: 10px; right: max(12px, calc(50% - 228px)); z-index: 20;
+    width: 42px; height: 42px; border-radius: 12px; cursor: pointer;
+    background: rgba(18, 6, 10, .6); border: 1px solid rgba(243, 201, 105, .35);
+    display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 5px;
+    backdrop-filter: blur(6px);
+  }
+  .burger span { width: 20px; height: 2px; background: var(--gold); border-radius: 2px; }
+  .menu {
+    position: fixed; top: 58px; right: max(12px, calc(50% - 228px)); z-index: 20;
+    background: rgba(30, 8, 14, .95); border: 1px solid rgba(243, 201, 105, .35);
+    border-radius: 14px; padding: 6px; min-width: 190px;
+    box-shadow: 0 10px 30px rgba(0,0,0,.5);
+  }
+  .menu button {
+    display: block; width: 100%; text-align: left; background: none; border: 0; color: var(--cream);
+    font: 700 1rem "Nunito", sans-serif; padding: 12px 14px; border-radius: 10px; cursor: pointer;
+  }
+  .menu button:active, .menu button:hover { background: rgba(196, 24, 58, .35); }
+  .hidden { display: none !important; }
+
+  /* ---------- landing ---------- */
+  #landing { justify-content: center; text-align: center; gap: 18px; }
+  .photo-frame {
+    width: min(78vw, 300px); aspect-ratio: 4 / 5; border-radius: 22px; overflow: hidden;
+    border: 3px solid var(--gold); position: relative;
+    box-shadow: 0 0 40px rgba(243, 201, 105, .25), 0 0 0 8px rgba(196, 24, 58, .25);
+    background: linear-gradient(160deg, #3a0b17, #1c060b);
+  }
+  .photo-frame img { width: 100%; height: 100%; object-fit: cover; display: none; }
+  .photo-frame.has-photo img { display: block; }
+  .photo-frame.has-photo .photo-placeholder { display: none; }
+  .photo-placeholder {
+    position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 8px; color: var(--muted); font-weight: 700; font-size: .95rem;
+  }
+  .photo-placeholder .icon { font-size: 3rem; opacity: .8; }
+  h1 {
+    font-family: "Great Vibes", cursive; font-weight: 400; margin: 0; line-height: 1.05;
+    font-size: clamp(2.6rem, 11vw, 3.4rem); color: var(--cream);
+    text-shadow: 0 0 18px rgba(243, 201, 105, .45);
+  }
+  h1 span { color: var(--gold); }
+  .sub { margin: 0; color: var(--muted); }
+  .play-card { margin-top: 6px; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+  .play-card p { margin: 0; font-weight: 700; letter-spacing: .02em; }
+
+  /* ---------- intro note ---------- */
+  #intro { justify-content: center; }
+  .note {
+    background: linear-gradient(180deg, rgba(74, 13, 28, .92), rgba(30, 8, 14, .92));
+    border: 2px solid var(--gold); border-radius: 22px; padding: 28px 22px; text-align: center;
+    box-shadow: 0 0 40px rgba(196, 24, 58, .35);
+  }
+  .note .gift { font-size: 3.4rem; animation: bob 2s ease-in-out infinite; }
+  @keyframes bob { 50% { transform: translateY(-6px) rotate(-4deg); } }
+  .note h2 { font-family: "Great Vibes", cursive; font-weight: 400; font-size: 2.4rem; margin: 6px 0 8px; color: var(--gold); }
+  .note p { margin: 0 0 12px; line-height: 1.5; }
+  .note .how { font-size: .92rem; color: var(--muted); margin-bottom: 22px; }
+
+  /* ---------- game ---------- */
+  #game { gap: 12px; justify-content: flex-start; }
+  .hud { width: 100%; display: flex; justify-content: space-between; align-items: center; }
+  .hud .pill {
+    background: rgba(18, 6, 10, .6); border: 1px solid rgba(243, 201, 105, .35);
+    border-radius: 999px; padding: 8px 16px; font-weight: 800;
+  }
+  .hud .moves b { color: var(--gold); font-size: 1.15rem; }
+  .goals {
+    width: 100%; display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;
+    background: rgba(18, 6, 10, .5); border-radius: 16px; padding: 10px;
+    border: 1px solid rgba(243, 201, 105, .2);
+  }
+  .goal { display: flex; align-items: center; gap: 6px; font-weight: 800; min-width: 52px; }
+  .goal .dot { width: 22px; height: 22px; border-radius: 50%; }
+  .goal.done b { color: #7dff9e; }
+
+  .board-wrap { width: 100%; flex: 1; display: flex; align-items: center; justify-content: center; min-height: 0; }
+  .board {
+    position: relative; display: grid;
+    grid-template-columns: repeat(7, 1fr); grid-template-rows: repeat(8, 1fr);
+    width: min(100%, calc((100dvh - 250px) * 7 / 8)); aspect-ratio: 7 / 8;
+    background: rgba(18, 6, 10, .55); border: 2px solid rgba(243, 201, 105, .4);
+    border-radius: 18px; padding: 6px; overflow: hidden;
+    box-shadow: inset 0 0 30px rgba(0,0,0,.5);
+  }
+  .tile { position: relative; cursor: pointer; }
+  .tile.fall { animation: fall .34s cubic-bezier(.3, 1.35, .6, 1) backwards; }
+  @keyframes fall { from { transform: translateY(calc(var(--d) * -100%)); } }
+  .bubble {
+    position: absolute; inset: 6%; border-radius: 50%;
+    box-shadow: inset -3px -4px 8px rgba(0,0,0,.35), 0 2px 6px rgba(0,0,0,.4);
+    transition: transform .2s, opacity .2s;
+  }
+  .bubble::after {
+    content: ""; position: absolute; top: 14%; left: 20%; width: 32%; height: 22%;
+    background: rgba(255,255,255,.55); border-radius: 50%; transform: rotate(-25deg);
+  }
+  .c0 { background: radial-gradient(circle at 35% 30%, #ff7a8a, #c4183a 70%); }
+  .c1 { background: radial-gradient(circle at 35% 30%, #8ff0a6, #1d7a3a 70%); }
+  .c2 { background: radial-gradient(circle at 35% 30%, #fff0b0, #d39a1c 70%); }
+  .c3 { background: radial-gradient(circle at 35% 30%, #a6d8ff, #1f5fae 70%); }
+  .c4 { background: radial-gradient(circle at 35% 30%, #e2b8ff, #6b2fa8 70%); }
+  .star {
+    background: radial-gradient(circle at 50% 45%, #fff6d0, #f3c969 45%, #b5121b 100%);
+    display: flex; align-items: center; justify-content: center;
+    font-size: clamp(16px, 5vw, 24px); color: #fff; text-shadow: 0 0 8px #fff;
+    animation: glow 1s ease-in-out infinite alternate;
+  }
+  .star::after { display: none; }
+  @keyframes glow { to { box-shadow: 0 0 18px #ffe08a, inset -3px -4px 8px rgba(0,0,0,.3); } }
+  .tile.popping .bubble { transform: scale(1.35); opacity: 0; }
+  .tile.shake .bubble { animation: shake .3s; }
+  @keyframes shake { 25% { transform: translateX(-3px); } 75% { transform: translateX(3px); } }
+
+  /* ---------- overlay ---------- */
+  .overlay {
+    position: fixed; inset: 0; z-index: 30; display: flex; align-items: center; justify-content: center;
+    background: rgba(10, 2, 5, .7); backdrop-filter: blur(4px); padding: 24px;
+  }
+  .overlay .note { max-width: 360px; width: 100%; animation: fadeIn .35s ease; }
+
+  /* ---------- finale ---------- */
+  #finale { justify-content: center; text-align: center; gap: 18px; }
+  #finale .gift { font-size: 4.5rem; animation: bob 2s ease-in-out infinite; }
+  #finale .unlocked { font-weight: 800; letter-spacing: .2em; text-transform: uppercase; color: var(--gold); font-size: .85rem; }
+  #finale h1 { font-size: clamp(2.8rem, 12vw, 3.8rem); }
+  .heart { color: var(--red); font-size: 2.2rem; animation: beat 1.2s ease-in-out infinite; }
+  @keyframes beat { 15%, 45% { transform: scale(1.25); } 30% { transform: scale(1); } }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="sparkles"></canvas>
+<div class="lights" id="lights"></div>
+
+<button class="burger" id="menuBtn" aria-label="Menu"><span></span><span></span><span></span></button>
+<nav class="menu hidden" id="menu">
+  <button data-act="home">🏠 Home</button>
+  <button data-act="restart">🔄 Restart level</button>
+  <button data-act="skip">🎁 Unlock gift</button>
+</nav>
+
+<main id="app">
+
+  <!-- LANDING -->
+  <section class="screen active" id="landing">
+    <div class="photo-frame" id="photoFrame">
+      <!-- Put your photo next to this file and name it photo.jpg -->
+      <img id="photo" alt="Us">
+      <div class="photo-placeholder"><div class="icon">📷</div><span>Your photo here</span></div>
+    </div>
+    <h1>Merry Christmas,<br><span>Katlyn</span></h1>
+    <p class="sub">I made you something ✨</p>
+    <div class="play-card">
+      <p>You can play this game</p>
+      <button class="btn" id="playBtn">Play ▶</button>
+    </div>
+  </section>
+
+  <!-- INTRO NOTE -->
+  <section class="screen" id="intro">
+    <div class="note">
+      <div class="gift">🎁</div>
+      <h2>A gift is waiting</h2>
+      <p>Beat <b>level 5</b> to unlock your next gift.</p>
+      <p class="how">Tap groups of 2 or more matching bubbles to pop them. Pop 6 or more at once to make a ★ star, then tap it to blast everything around it.</p>
+      <button class="btn" id="startBtn">Let's go</button>
+    </div>
+  </section>
+
+  <!-- GAME -->
+  <section class="screen" id="game">
+    <div class="hud">
+      <div class="pill" id="levelLabel">Level 1</div>
+      <div class="pill moves">Moves <b id="movesLabel">20</b></div>
+    </div>
+    <div class="goals" id="goals"></div>
+    <div class="board-wrap"><div class="board" id="board"></div></div>
+  </section>
+
+  <!-- FINALE -->
+  <section class="screen" id="finale">
+    <div class="gift">🎁</div>
+    <div class="unlocked">Gift unlocked</div>
+    <h1>Merry Christmas,<br><span>Katlyn</span></h1>
+    <p style="font-size:1.3rem;font-weight:800;margin:0;">I love you</p>
+    <div class="heart">❤</div>
+    <button class="btn" id="againBtn" style="margin-top:10px;">Play again</button>
+  </section>
+
+</main>
+
+<div class="overlay hidden" id="overlay">
+  <div class="note">
+    <div class="gift" id="ovIcon">⭐</div>
+    <h2 id="ovTitle"></h2>
+    <p id="ovText"></p>
+    <button class="btn" id="ovBtn"></button>
+  </div>
+</div>
+
+<script>
+(() => {
+  /* ================= SETTINGS (easy to edit) ================= */
+  const PHOTO = "photo.jpg";   // put your picture next to index.html with this name
+  const COLS = 7, ROWS = 8;
+  const STAR_SIZE = 6;         // pop this many at once to make a star
+
+  // goals: colour index -> how many to pop. 0 red, 1 green, 2 gold, 3 blue, 4 purple
+  const LEVELS = [
+    { colors: 4, moves: 20, goals: { 0: 12, 1: 12 } },
+    { colors: 4, moves: 20, goals: { 0: 18, 2: 18, 3: 15 } },
+    { colors: 5, moves: 22, goals: { 1: 20, 2: 20, 4: 18 } },
+    { colors: 5, moves: 22, goals: { 0: 20, 1: 20, 3: 20, 4: 16 } },
+    { colors: 5, moves: 24, goals: { 0: 20, 1: 20, 2: 20, 3: 20, 4: 20 } },
+  ];
+
+  /* ================= helpers ================= */
+  const $ = (id) => document.getElementById(id);
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); } catch (e) { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} },
+  };
+
+  function show(id) {
+    document.querySelectorAll(".screen").forEach((s) => s.classList.toggle("active", s.id === id));
+    $("menu").classList.add("hidden");
+  }
+
+  /* ================= photo ================= */
+  const img = $("photo");
+  img.addEventListener("load", () => $("photoFrame").classList.add("has-photo"));
+  img.src = PHOTO;
+
+  /* ================= fairy lights ================= */
+  (function buildLights() {
+    const el = $("lights");
+    const n = 13, colors = ["#ff3b5c", "#f3c969", "#4fe07a", "#fff3e6", "#6bb8ff"];
+    el.innerHTML = '<svg viewBox="0 0 100 46" preserveAspectRatio="none"><path d="M0,6 Q8.3,22 16.6,6 T33.3,6 T50,6 T66.6,6 T83.3,6 T100,6" fill="none" stroke="#2c1a10" stroke-width="0.6"/></svg>';
+    for (let i = 0; i < n; i++) {
+      const x = (i + 0.5) / n;
+      const phase = (x * 100) % 16.6 / 16.6;          // follows the wire's dips
+      const y = 6 + Math.sin(phase * Math.PI) * 14;
+      const b = document.createElement("div");
+      const col = colors[i % colors.length];
+      b.className = "bulb";
+      b.style.left = `calc(${x * 100}% - 5px)`;
+      b.style.top = `${y}px`;
+      b.style.background = col;
+      b.style.boxShadow = `0 0 10px 3px ${col}`;
+      b.style.animationDelay = `${(i * 0.37) % 1.6}s`;
+      el.appendChild(b);
+    }
+  })();
+
+  /* ================= sparkles canvas ================= */
+  const sparkles = (() => {
+    const cv = $("sparkles"), ctx = cv.getContext("2d");
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const hues = ["255,214,120", "255,90,110", "255,245,230"];
+    let W, H, parts = [];
+    function resize() {
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      W = cv.width = innerWidth * dpr; H = cv.height = innerHeight * dpr;
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+    }
+    function make(burst) {
+      return {
+        x: Math.random() * W,
+        y: burst ? H * 0.45 + (Math.random() - 0.5) * H * 0.2 : Math.random() * H,
+        r: (Math.random() * 1.8 + 0.8) * (W / innerWidth),
+        vy: burst ? (Math.random() - 0.7) * 6 : Math.random() * 0.5 + 0.2,
+        vx: burst ? (Math.random() - 0.5) * 6 : 0,
+        sway: Math.random() * Math.PI * 2,
+        tw: Math.random() * Math.PI * 2,
+        c: hues[(Math.random() * hues.length) | 0],
+        life: burst ? 1 : Infinity,
+      };
+    }
+    resize();
+    addEventListener("resize", resize);
+    for (let i = 0; i < (reduce ? 25 : 70); i++) parts.push(make(false));
+    function frame() {
+      ctx.clearRect(0, 0, W, H);
+      parts.forEach((p) => {
+        p.tw += 0.05; p.sway += 0.01;
+        p.y += p.vy * (W / innerWidth);
+        p.x += (p.vx + Math.sin(p.sway) * 0.3) * (W / innerWidth);
+        if (p.life !== Infinity) { p.vy += 0.08; p.vx *= 0.98; p.life -= 0.008; }
+        if (p.life === Infinity && p.y > H + 10) { p.y = -10; p.x = Math.random() * W; }
+        const a = Math.max(0, (0.5 + Math.sin(p.tw) * 0.5) * Math.min(1, p.life));
+        ctx.beginPath();
+        ctx.fillStyle = `rgba(${p.c},${a})`;
+        ctx.shadowColor = `rgba(${p.c},1)`;
+        ctx.shadowBlur = p.r * 6;
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fill();
+      });
+      parts = parts.filter((p) => p.life > 0);
+      if (!reduce) requestAnimationFrame(frame);
+    }
+    frame();
+    return { burst(n = 120) { for (let i = 0; i < n; i++) parts.push(make(true)); if (reduce) frame(); } };
+  })();
+
+  /* ================= game ================= */
+  let level = 0, board = [], moves = 0, goals = {}, busy = false, uid = 0;
+  const boardEl = $("board");
+
+  const rand = (n) => (Math.random() * n) | 0;
+  const newTile = () => ({ id: ++uid, c: rand(LEVELS[level].colors), t: "n" });
+
+  function hasMove() {
+    for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++) {
+      const t = board[r][c];
+      if (t.t === "star") return true;
+      if (c + 1 < COLS && board[r][c + 1].t === "n" && board[r][c + 1].c === t.c) return true;
+      if (r + 1 < ROWS && board[r + 1][c].t === "n" && board[r + 1][c].c === t.c) return true;
+    }
+    return false;
+  }
+
+  function fillBoard() {
+    do {
+      board = Array.from({ length: ROWS }, () => Array.from({ length: COLS }, newTile));
+    } while (!hasMove());
+  }
+
+  function shuffle() {
+    const all = board.flat();
+    for (let tries = 0; tries < 50; tries++) {
+      for (let i = all.length - 1; i > 0; i--) { const j = rand(i + 1); [all[i], all[j]] = [all[j], all[i]]; }
+      for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++) board[r][c] = all[r * COLS + c];
+      if (hasMove()) return;
+    }
+    fillBoard();
+  }
+
+  function flood(r, c) {
+    const color = board[r][c].c, seen = new Set(), out = [], stack = [[r, c]];
+    while (stack.length) {
+      const [y, x] = stack.pop(), key = y * COLS + x;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      const t = board[y] && board[y][x];
+      if (!t || t.t !== "n" || t.c !== color) continue;
+      out.push([y, x]);
+      stack.push([y + 1, x], [y - 1, x], [y, x + 1], [y, x - 1]);
+    }
+    return out;
+  }
+
+  function render(falls = {}) {
+    let html = "";
+    for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++) {
+      const t = board[r][c], d = falls[t.id] || 0;
+      const inner = t.t === "star" ? '<div class="bubble star">★</div>' : `<div class="bubble c${t.c}"></div>`;
+      html += `<div class="tile${d ? " fall" : ""}" data-id="${t.id}" data-r="${r}" data-c="${c}" style="grid-row:${r + 1};grid-column:${c + 1};--d:${d}">${inner}</div>`;
+    }
+    boardEl.innerHTML = html;
+  }
+
+  function renderHud() {
+    $("levelLabel").textContent = `Level ${level + 1} / ${LEVELS.length}`;
+    $("movesLabel").textContent = moves;
+    $("goals").innerHTML = Object.keys(goals).map((k) => {
+      const left = goals[k];
+      return `<div class="goal${left <= 0 ? " done" : ""}"><span class="dot c${k}"></span><b>${left <= 0 ? "✓" : left}</b></div>`;
+    }).join("");
+  }
+
+  function collapse() {
+    const falls = {};
+    for (let c = 0; c < COLS; c++) {
+      let write = ROWS - 1;
+      for (let r = ROWS - 1; r >= 0; r--) {
+        const t = board[r][c];
+        if (!t) continue;
+        if (r !== write) { board[write][c] = t; board[r][c] = null; falls[t.id] = write - r; }
+        write--;
+      }
+      const missing = write + 1;
+      for (let r = write; r >= 0; r--) { const t = newTile(); board[r][c] = t; falls[t.id] = missing; }
+    }
+    return falls;
+  }
+
+  function startLevel(i) {
+    level = i;
+    const L = LEVELS[level];
+    moves = L.moves;
+    goals = { ...L.goals };
+    busy = false;
+    fillBoard();
+    render();
+    renderHud();
+    show("game");
+  }
+
+  function pop(cells, starAt) {
+    busy = true;
+    moves--;
+    cells.forEach(([r, c]) => {
+      const t = board[r][c];
+      if (t.t === "n" && goals[t.c] > 0) goals[t.c]--;
+      const el = boardEl.querySelector(`[data-id="${t.id}"]`);
+      if (el) el.classList.add("popping");
+    });
+    renderHud();
+    setTimeout(() => {
+      cells.forEach(([r, c]) => (board[r][c] = null));
+      if (starAt) board[starAt[0]][starAt[1]] = { id: ++uid, c: -1, t: "star" };
+      const falls = collapse();
+      render(falls);
+      setTimeout(afterMove, 360);
+    }, 220);
+  }
+
+  function afterMove() {
+    const won = Object.values(goals).every((v) => v <= 0);
+    if (won) {
+      busy = true;
+      sparkles.burst(80);
+      if (level === LEVELS.length - 1) {
+        store.set("katlynLevel", 0);
+        setTimeout(finale, 600);
+      } else {
+        store.set("katlynLevel", level + 1);
+        overlay("⭐", `Level ${level + 1} complete!`, level + 1 === LEVELS.length - 1 ? "One more to go. The gift is so close!" : "You're amazing. On to the next one!", "Next level", () => startLevel(level + 1));
+      }
+      return;
+    }
+    if (moves <= 0) {
+      busy = true;
+      overlay("🎄", "Out of moves", "So close! Want to try again?", "Try again", () => startLevel(level));
+      return;
+    }
+    if (!hasMove()) { shuffle(); render(); }
+    busy = false;
+  }
+
+  boardEl.addEventListener("click", (e) => {
+    if (busy) return;
+    const tile = e.target.closest(".tile");
+    if (!tile) return;
+    const r = +tile.dataset.r, c = +tile.dataset.c, t = board[r][c];
+    if (t.t === "star") {
+      const cells = [];
+      for (let y = r - 1; y <= r + 1; y++) for (let x = c - 1; x <= c + 1; x++)
+        if (y >= 0 && y < ROWS && x >= 0 && x < COLS) cells.push([y, x]);
+      pop(cells, null);
+      return;
+    }
+    const group = flood(r, c);
+    if (group.length < 2) {
+      tile.classList.remove("shake"); void tile.offsetWidth; tile.classList.add("shake");
+      return;
+    }
+    pop(group, group.length >= STAR_SIZE ? [r, c] : null);
+  });
+
+  /* ================= overlay + finale ================= */
+  function overlay(icon, title, text, btn, fn) {
+    $("ovIcon").textContent = icon;
+    $("ovTitle").textContent = title;
+    $("ovText").textContent = text;
+    $("ovBtn").textContent = btn;
+    $("ovBtn").onclick = () => { $("overlay").classList.add("hidden"); fn(); };
+    $("overlay").classList.remove("hidden");
+  }
+
+  function finale() {
+    $("overlay").classList.add("hidden");
+    show("finale");
+    sparkles.burst(200);
+  }
+
+  /* ================= buttons + menu ================= */
+  $("playBtn").onclick = () => show("intro");
+  $("startBtn").onclick = () => startLevel(store.get("katlynLevel", 0));
+  $("againBtn").onclick = () => { store.set("katlynLevel", 0); show("landing"); };
+
+  $("menuBtn").onclick = (e) => { e.stopPropagation(); $("menu").classList.toggle("hidden"); };
+  document.addEventListener("click", (e) => {
+    if (!e.target.closest("#menu") && !e.target.closest("#menuBtn")) $("menu").classList.add("hidden");
+  });
+  $("menu").addEventListener("click", (e) => {
+    const act = e.target.closest("button") && e.target.closest("button").dataset.act;
+    if (!act) return;
+    $("overlay").classList.add("hidden");
+    if (act === "home") show("landing");
+    if (act === "restart") startLevel(level);
+    if (act === "skip") finale();
+  });
+})();
+</script>
+</body>
+</html>

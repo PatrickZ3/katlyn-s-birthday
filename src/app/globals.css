@@ -1,0 +1,436 @@
+@import "tailwindcss";
+
+@theme {
+  --color-bg: #12060a;
+  --color-deep: #2a0a12;
+  --color-wine: #4a0d1c;
+  --color-red: #c4183a;
+  --color-gold: #f3c969;
+  --color-cream: #fff3e6;
+  --color-muted: #e9c9cf;
+  --color-done: #7dff9e;
+
+  --font-sans: var(--font-nunito), system-ui, sans-serif;
+  --font-script: var(--font-great-vibes), cursive;
+
+  --animate-twinkle: twinkle 1.6s ease-in-out infinite alternate;
+  --animate-bob: bob 2s ease-in-out infinite;
+  --animate-beat: beat 1.2s ease-in-out infinite;
+  --animate-shake: shake 0.3s;
+  --animate-glow: glow 1s ease-in-out infinite alternate;
+  --animate-flicker: flicker 0.7s ease-in-out infinite alternate;
+  --animate-hearth: hearth 1.4s ease-in-out infinite alternate;
+  --animate-ring: ring 1.6s ease-in-out infinite;
+  --animate-rays: turn 48s linear infinite;
+  --animate-rays-back: turn 70s linear infinite reverse;
+  --animate-orbit: turn 26s linear infinite;
+  --animate-halo: halo 2.8s ease-in-out infinite alternate;
+  --animate-ripple: ripple 3.6s ease-out infinite;
+
+  @keyframes twinkle {
+    from { opacity: 0.35; filter: brightness(0.7); }
+    to { opacity: 1; filter: brightness(1.3); }
+  }
+  @keyframes bob {
+    50% { transform: translateY(-6px) rotate(-4deg); }
+  }
+  @keyframes beat {
+    15%, 45% { transform: scale(1.25); }
+    30% { transform: scale(1); }
+  }
+  @keyframes shake {
+    25% { transform: translateX(-3px); }
+    75% { transform: translateX(3px); }
+  }
+  @keyframes turn {
+    to { transform: rotate(360deg); }
+  }
+  @keyframes halo {
+    from { opacity: 0.65; transform: scale(0.94); }
+    to { opacity: 1; transform: scale(1.06); }
+  }
+  @keyframes ripple {
+    from { opacity: 0.55; transform: scale(0.55); }
+    to { opacity: 0; transform: scale(1.22); }
+  }
+  @keyframes flicker {
+    from { transform: scale(1, 0.92) skewX(-2deg); }
+    to { transform: scale(0.95, 1.08) skewX(2deg); }
+  }
+  @keyframes hearth {
+    from { opacity: 0.55; }
+    to { opacity: 1; }
+  }
+  @keyframes ring {
+    50% { box-shadow: 0 0 0 3px var(--color-gold), 0 0 16px 4px rgba(243, 201, 105, 0.7); }
+  }
+  @keyframes glow {
+    to { box-shadow: 0 0 18px #ffe08a, inset -3px -4px 8px rgba(0, 0, 0, 0.3); }
+  }
+}
+
+@layer base {
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+  html,
+  body {
+    height: 100%;
+  }
+  body {
+    background: radial-gradient(ellipse at 50% 22%, #a81c38 0%, #7d1429 40%, #560e1e 75%, #3c0a16 100%) fixed;
+    background-color: var(--color-bg);
+    color: var(--color-cream);
+    font-family: var(--font-sans);
+    overflow: hidden;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  /* Velvet texture over the red: fabric grain, a fine weave and a snowflake print. */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background-image:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .1 0 0 0 0 0 0 0 0 0 .02 0 0 0 1 -.36'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23g)'/%3E%3C/svg%3E"),
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' fill='none' stroke='%23f3c969' stroke-opacity='.13' stroke-width='1.3' stroke-linecap='round'%3E%3Cg id='f'%3E%3Cpath d='M30 15v30M17 22.500l26 15M17 37.500l26-15M30 20l-3-3m3 3 3-3M30 40l-3 3m3-3 3 3M21.300 25l-4 1m4-1-1-4M38.700 35l4-1m-4 1 1 4M21.300 35l-4-1m4 1-1 4M38.700 25l4 1m-4-1 1-4'/%3E%3C/g%3E%3Cuse href='%23f' x='60' y='60'/%3E%3Cpath d='M90 20l8.700 5v10l-8.700 5-8.700-5v-10zM98.700 25l6-3.500M30 80l8.700 5v10l-8.700 5-8.700-5v-10zM21.300 95l-6 3.500'/%3E%3Ccircle cx='90' cy='30' r='5'/%3E%3Ccircle cx='30' cy='90' r='5'/%3E%3C/svg%3E"),
+      repeating-linear-gradient(45deg, rgba(0, 0, 0, 0.1) 0 1px, transparent 1px 3px),
+      repeating-linear-gradient(-45deg, rgba(255, 255, 255, 0.022) 0 1px, transparent 1px 3px);
+  }
+  button {
+    cursor: pointer;
+    touch-action: manipulation;
+  }
+}
+
+@layer components {
+  .btn {
+    font-weight: 800;
+    font-size: 1.1rem;
+    color: #fff;
+    background: linear-gradient(180deg, #e8334f, #a10f2c);
+    border: 2px solid var(--color-gold);
+    border-radius: 999px;
+    padding: 14px 34px;
+    box-shadow: 0 0 22px rgba(232, 51, 79, 0.45), inset 0 2px 0 rgba(255, 255, 255, 0.25);
+    transition: transform 0.12s;
+  }
+  .btn:active {
+    transform: scale(0.95);
+  }
+
+  .btn-quiet {
+    position: relative;
+    font-weight: 800;
+    color: var(--color-cream);
+    border: 1.5px solid rgba(243, 201, 105, 0.55);
+    border-radius: 999px;
+    padding: 9px 24px;
+    background: rgba(18, 6, 10, 0.5);
+    transition: transform 0.12s;
+  }
+  .btn-quiet:active {
+    transform: scale(0.95);
+  }
+
+  .pill {
+    position: relative;
+    border: 1px solid rgba(243, 201, 105, 0.35);
+    border-radius: 999px;
+    background: rgba(18, 6, 10, 0.6);
+    padding: 8px 16px;
+    font-weight: 800;
+  }
+
+  /* Light rays behind the present, fading out before they reach the screen edges. */
+  .present-rays {
+    background: repeating-conic-gradient(rgba(255, 214, 120, 0.3) 0 8deg, transparent 8deg 24deg);
+    -webkit-mask-image: radial-gradient(circle, #000 14%, transparent 68%);
+    mask-image: radial-gradient(circle, #000 14%, transparent 68%);
+  }
+  .present-rays-soft {
+    background: repeating-conic-gradient(rgba(255, 150, 150, 0.16) 0 14deg, transparent 14deg 40deg);
+    -webkit-mask-image: radial-gradient(circle, #000 10%, transparent 62%);
+    mask-image: radial-gradient(circle, #000 10%, transparent 62%);
+  }
+
+  /* A red and white candy cane border around whatever is inside. */
+  .candy-frame {
+    position: relative;
+    padding: 7px;
+    border-radius: 26px;
+    background: repeating-linear-gradient(45deg, #c4183a 0 11px, #fff6ec 11px 22px);
+    box-shadow: 0 0 40px rgba(243, 201, 105, 0.25);
+  }
+
+  .note-card {
+    position: relative;
+    background: linear-gradient(180deg, rgba(74, 13, 28, 0.92), rgba(30, 8, 14, 0.92));
+    border: 2px solid var(--color-gold);
+    border-radius: 22px;
+    padding: 28px 22px;
+    text-align: center;
+    box-shadow: 0 0 40px rgba(196, 24, 58, 0.35);
+  }
+
+  .script-title {
+    font-family: var(--font-script);
+    line-height: 1.05;
+    text-shadow: 0 0 18px rgba(243, 201, 105, 0.45);
+  }
+
+  .bulb::before {
+    content: "";
+    position: absolute;
+    top: -4px;
+    left: 2px;
+    width: 6px;
+    height: 5px;
+    background: #3b2a1a;
+    border-radius: 2px;
+  }
+
+  .bubble {
+    position: absolute;
+    inset: 14% 10% 6%;
+    border-radius: 50%;
+    box-shadow: inset -3px -4px 8px rgba(0, 0, 0, 0.35), 0 2px 6px rgba(0, 0, 0, 0.4);
+  }
+  /* The little gold cap that turns a bubble into a bauble. */
+  .bubble::before,
+  .ornament::before {
+    content: "";
+    position: absolute;
+    top: -9%;
+    left: 37%;
+    width: 26%;
+    height: 13%;
+    border-radius: 2px 2px 1px 1px;
+    background: linear-gradient(90deg, #a87a1c, #ffe9a8 45%, #a87a1c);
+  }
+  .ornament {
+    position: relative;
+    border-radius: 50%;
+    box-shadow: inset -2px -3px 6px rgba(0, 0, 0, 0.35);
+  }
+  .bubble::after {
+    content: "";
+    position: absolute;
+    top: 14%;
+    left: 20%;
+    width: 32%;
+    height: 22%;
+    background: rgba(255, 255, 255, 0.55);
+    border-radius: 50%;
+    transform: rotate(-25deg);
+  }
+  .bubble-star {
+    background: radial-gradient(circle at 50% 45%, #fff6d0, #f3c969 45%, #b5121b 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: clamp(16px, 5vw, 24px);
+    color: #fff;
+    text-shadow: 0 0 8px #fff;
+  }
+  .bubble-star::before,
+  .bubble-star::after {
+    display: none;
+  }
+
+  /* A little framed sticker on the Cute stuff page. */
+  .sticker-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 12px 8px 10px;
+    border-radius: 16px;
+    border: 1.5px dashed rgba(243, 201, 105, 0.55);
+    background: linear-gradient(180deg, #4a0d1c, #220810);
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.35);
+    text-align: center;
+  }
+
+  /* Fades scrolling content in and out at the edges instead of cutting it off. */
+  .scroll-fade {
+    -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 16px, #000 calc(100% - 26px), transparent 100%);
+    mask-image: linear-gradient(180deg, transparent 0, #000 16px, #000 calc(100% - 26px), transparent 100%);
+  }
+
+  /* The Daily, Weekly and One time switch on the gifts page. */
+  .gift-slider {
+    position: relative;
+    display: flex;
+    gap: 4px;
+    width: 100%;
+    padding: 5px;
+    border-radius: 22px;
+    border: 2px solid var(--color-gold);
+    background: linear-gradient(180deg, #22070f, #3a0c18);
+    box-shadow: inset 0 3px 8px rgba(0, 0, 0, 0.55), 0 0 18px rgba(243, 201, 105, 0.22);
+  }
+  .gift-tab {
+    position: relative;
+    flex: 1;
+    min-width: 0;
+    padding: 7px 2px 6px;
+    border-radius: 16px;
+    font-size: min(0.88rem, 3.5vw);
+    font-weight: 800;
+    color: var(--color-muted);
+    transition: color 0.2s;
+  }
+  .gift-tab[aria-selected="true"] {
+    color: #fff;
+    text-shadow: 0 1px 3px rgba(60, 0, 10, 0.9);
+  }
+  /* The candy cane handle that slides between the tabs. */
+  .gift-thumb {
+    position: absolute;
+    inset: 0;
+    border-radius: 16px;
+    border: 1.5px solid #fff3e6;
+    background: repeating-linear-gradient(-45deg, #c4183a 0 12px, #e0485f 12px 18px);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.5), 0 0 14px rgba(232, 51, 79, 0.6);
+  }
+
+  /* The prescription symbol on each gift tag. */
+  .gift-rx {
+    display: inline-block;
+    height: 1.15em;
+    width: auto;
+    margin-right: 0.3em;
+    vertical-align: -0.28em;
+    color: #8c1228;
+  }
+
+  /* Santa spends most of the loop off screen, so he stays a nice surprise. */
+  .santa-flight {
+    position: absolute;
+    top: calc(4px + env(safe-area-inset-top));
+    left: 0;
+    width: 150px;
+    transform: translateX(-170px);
+    animation: santa-fly 36s linear 3s infinite;
+    filter: drop-shadow(0 0 4px rgba(255, 240, 205, 0.8));
+  }
+  .santa-bob { animation: santa-bob 1.5s ease-in-out infinite alternate; }
+  .santa-deer { animation: santa-deer 0.5s ease-in-out infinite alternate; }
+
+  /* The two buddies swing their legs and sway as they walk. */
+  .walker-sway {
+    transform-box: fill-box;
+    transform-origin: 50% 100%;
+    animation: walker-sway 0.6s ease-in-out infinite alternate;
+  }
+  .walker-leg {
+    transform-box: fill-box;
+    transform-origin: 50% 0;
+    animation: walker-step 0.6s ease-in-out infinite alternate;
+  }
+  .walker-leg-2 { animation-direction: alternate-reverse; }
+
+  /* Each gift is a wrapped present with a tag on it. */
+  .gift-box {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: min(132px, 19dvh);
+    padding: 20px 8px;
+    border-radius: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    box-shadow: 0 10px 22px rgba(0, 0, 0, 0.45), inset 0 2px 0 rgba(255, 255, 255, 0.18);
+  }
+  .gift-box::before,
+  .gift-box::after {
+    content: "";
+    position: absolute;
+    background: linear-gradient(90deg, #d39a1c, #ffe29a 50%, #d39a1c);
+  }
+  .gift-box::before {
+    top: 0;
+    bottom: 0;
+    left: calc(50% - 9px);
+    width: 18px;
+  }
+  .gift-box::after {
+    left: 0;
+    right: 0;
+    top: calc(50% - 9px);
+    height: 18px;
+    background: linear-gradient(180deg, #d39a1c, #ffe29a 50%, #d39a1c);
+  }
+  .gift-red { background: repeating-linear-gradient(45deg, #a50f2b 0 16px, #c4183a 16px 32px); }
+  .gift-green { background: repeating-linear-gradient(45deg, #14562d 0 16px, #1d7a3a 16px 32px); }
+  .gift-navy { background: repeating-linear-gradient(45deg, #17305e 0 16px, #1f4384 16px 32px); }
+  .gift-candy { background: repeating-linear-gradient(45deg, #fff0e0 0 16px, #d9304a 16px 32px); }
+  .gift-tag {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1px;
+    width: 100%;
+    max-width: 250px;
+    padding: 11px 10px 12px;
+    border-radius: 12px;
+    background: var(--color-cream);
+    color: var(--color-wine);
+    font-weight: 800;
+    font-size: 1rem;
+    line-height: 1.2;
+    text-align: center;
+    outline: 1.5px dashed rgba(74, 13, 28, 0.4);
+    outline-offset: -6px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+  }
+
+  .color-0 { background: radial-gradient(circle at 35% 30%, #ff7a8a, #c4183a 70%); }
+  .color-1 { background: radial-gradient(circle at 35% 30%, #8ff0a6, #1d7a3a 70%); }
+  .color-2 { background: radial-gradient(circle at 35% 30%, #fff0b0, #d39a1c 70%); }
+  .color-3 { background: radial-gradient(circle at 35% 30%, #a6d8ff, #1f5fae 70%); }
+  .color-4 { background: radial-gradient(circle at 35% 30%, #e2b8ff, #6b2fa8 70%); }
+}
+
+@keyframes santa-fly {
+  0% { transform: translateX(-170px); }
+  36%, 100% { transform: translateX(100vw); }
+}
+@keyframes santa-bob {
+  from { transform: translateY(-2px) rotate(-1.5deg); }
+  to { transform: translateY(3px) rotate(1.5deg); }
+}
+@keyframes santa-deer {
+  from { transform: translateY(-2px); }
+  to { transform: translateY(2px); }
+}
+@keyframes walker-sway {
+  from { transform: rotate(-4deg); }
+  to { transform: rotate(4deg); }
+}
+@keyframes walker-step {
+  from { transform: rotate(-16deg); }
+  to { transform: rotate(16deg); }
+}
+
+/* Wide screens crop the top of the hills, which would cut off the buddies. */
+@media (min-width: 640px) {
+  .walkers { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .moving-decor { display: none; }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
