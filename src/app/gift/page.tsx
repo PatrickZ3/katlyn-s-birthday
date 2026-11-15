@@ -15,14 +15,10 @@ import { config } from "@/config";
  */
 const WRAPPING = ["gift-red", "gift-green", "gift-navy", "gift-candy"];
 
-/** With this many gifts or fewer, each one gets a full-width row. */
-const MAX_FULL_WIDTH_GIFTS = 2;
-
 export default function GiftPage() {
   const { title, showRx, types } = config.gift;
   const [activeTab, setActiveTab] = useState(0);
   const active = types[activeTab];
-  const fullWidth = active.items.length <= MAX_FULL_WIDTH_GIFTS;
 
   return (
     <section className="flex h-full w-full flex-col items-center">
@@ -69,16 +65,15 @@ export default function GiftPage() {
       <AnimatePresence mode="wait">
         <motion.ul
           key={active.label}
-          className={`scroll-fade mb-[calc(min(15dvh,120px)-16px)] grid min-h-0 w-full flex-1 content-center-safe gap-x-3 gap-y-9 overflow-y-auto overscroll-contain px-1 pt-7 pb-5 ${fullWidth ? "grid-cols-1" : "grid-cols-2"}`}
+          className={`scroll-fade mb-[calc(min(15dvh,120px)-16px)] grid min-h-0 w-full flex-1 auto-rows-max content-center-safe gap-y-8 overflow-y-auto overscroll-contain px-1 pt-7 pb-5`}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.12 }}
         >
-          {active.items.map((item, i) => {
-            const lastAlone = !fullWidth && i === active.items.length - 1 && i % 2 === 0;
-            return (
+          {/* Each gift is a capsule pill wrapped like a present. */}
+          {active.items.map((item, i) => (
               <motion.li
                 key={item}
-                className={`gift-box ${WRAPPING[i % WRAPPING.length]} ${lastAlone ? "col-span-2" : ""}`}
+                className={`gift-box ${WRAPPING[i % WRAPPING.length]}`}
                 initial={{ opacity: 0, y: -30, rotate: i % 2 ? 3 : -3 }}
                 animate={{ opacity: 1, y: 0, rotate: i % 2 ? 0.8 : -0.8 }}
                 transition={{
@@ -88,15 +83,16 @@ export default function GiftPage() {
                   damping: 14,
                 }}
               >
-                <SnowCap />
+                <span className="pill-half" aria-hidden />
+                <span className="pill-shine" aria-hidden />
+                <SnowCap className="left-[17%] w-[66%]" />
                 <Bow className="absolute -top-[23px] left-1/2 z-20 w-[66px] -translate-x-1/2" />
-                <span className={`gift-tag ${fullWidth ? "text-[1.15rem]" : ""}`}>
+                <span className="gift-tag">
                   {showRx && <RxMark className="gift-rx" />}
                   {item}
                 </span>
               </motion.li>
-            );
-          })}
+          ))}
         </motion.ul>
       </AnimatePresence>
     </section>

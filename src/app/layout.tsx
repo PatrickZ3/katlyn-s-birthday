@@ -23,7 +23,11 @@ const greatVibes = Great_Vibes({
   variable: "--font-great-vibes",
 });
 
-export const metadata: Metadata = { title: config.pageTitle };
+export const metadata: Metadata = {
+  title: config.pageTitle,
+  // If she taps Share > Add to Home Screen, it opens full screen like an app.
+  appleWebApp: { capable: true, title: config.name, statusBarStyle: "black-translucent" },
+};
 
 export const viewport: Viewport = {
   width: "device-width",

@@ -24,7 +24,8 @@ export default function PlayPage() {
         </div>
       </div>
       <Goals goals={game.goals} />
-      <div className="flex min-h-0 w-full flex-1 items-center justify-center">
+      {/* On tall phones, keep the board centred above the snowy hills. */}
+      <div className="flex min-h-0 w-full flex-1 items-center justify-center [@media(min-height:800px)]:pb-[calc(min(15dvh,120px)-16px)]">
         <GameBoard />
       </div>
       <LevelOverlay />

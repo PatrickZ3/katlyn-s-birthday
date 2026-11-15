@@ -1,11 +1,14 @@
-/** A drift of snow that sits along the top edge. The parent must be position: relative. */
-export function SnowCap() {
+/**
+ * A drift of snow that sits along the top edge. The parent must be position: relative.
+ * `className` sets where it sits across the top (its left edge and width).
+ */
+export function SnowCap({ className = "left-[9%] w-[82%]" }: { className?: string }) {
   return (
     <svg
       viewBox="0 0 200 20"
       preserveAspectRatio="none"
       aria-hidden
-      className="pointer-events-none absolute -top-[7px] left-[9%] z-10 h-[15px] w-[82%] drop-shadow-[0_2px_2px_rgba(0,0,0,0.3)]"
+      className={`pointer-events-none absolute -top-[7px] z-10 h-[15px] drop-shadow-[0_2px_2px_rgba(0,0,0,0.3)] ${className}`}
     >
       <path
         fill="#dbe7f3"

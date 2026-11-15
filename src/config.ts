@@ -79,13 +79,14 @@ type CuteSection = {
  *
  * GOOD TO KNOW:
  *   - Every type needs at least 1 gift.
- *   - 4 gifts in a type fit on screen on an iPhone 14 or larger. With more
- *     than that, or on a smaller phone like an iPhone SE, the list scrolls.
+ *   - Each gift is a pill-shaped present in its own row. About 2 fit on
+ *     screen on an iPhone 14, and 3 on a bigger phone like an iPhone 14 Plus.
+ *     With more than that the list scrolls, with a fade at the bottom to
+ *     show there's more. On a small phone like an iPhone SE, 1 fits.
  *   - Long gifts just wrap onto more lines, so nothing gets cut off.
  *   - Two gifts in the same type can't have identical wording.
- *   - Wrapping colours are automatic: red, green, navy, candy cane, repeating.
- *   - 1 or 2 gifts show as big full-width presents. With 3 or more, they sit
- *     two per row.
+ *   - Pill colours are automatic and repeat in this order: red + green,
+ *     green + cream, navy + red, candy cane + green.
  *   - `showRx` puts the pharmacy prescription symbol on each gift tag. To
  *     remove it, change it to  showRx: false,
  */
@@ -97,19 +98,19 @@ const gift: { title: string; showRx: boolean; types: GiftType[] } = {
       label: "Daily",
       icon: "⛄",
       dose: "Take once daily, with love.",
-      items: ["Placeholder daily gift 1", "Placeholder daily gift 2"],
+      items: ["A photoshoot", "Harass-me session", "I'll say anything you want"],
     },
     {
       label: "Weekly",
       icon: "🎄",
       dose: "Take once weekly. Refills included.",
-      items: ["Placeholder weekly gift 1", "Placeholder weekly gift 2"],
+      items: ["Free dinner", "My embarrassing pics", "Sitting in silence together"],
     },
     {
       label: "One time",
       icon: "🎁",
       dose: "Single dose. No refills.",
-      items: ["Day trip with me", "Slave for the day"],
+      items: ["Day trip with me", "Your slave for the day", "Fingering me"],
     },
   ],
 };
@@ -189,8 +190,12 @@ const cuteStuff: { title: string; sections: CuteSection[] } = {
 
 export const config = {
   name,
-  /** Put the file in public/. A placeholder shows until it exists. */
-  photo: "/photo.jpg",
+  /**
+   * Put the file in public/. A placeholder shows until it exists.
+   * The name must match exactly, capitals included (photo.JPG is not
+   * photo.jpg on the live site, even though your Mac treats them the same).
+   */
+  photo: "/photo.JPG",
   photoAlt: "Us",
   pageTitle: `Merry Christmas, ${name}`,
 

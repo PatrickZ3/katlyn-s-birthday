@@ -335,21 +335,53 @@
   .walker-leg-2 { animation-direction: alternate-reverse; }
 
   /* Each gift is a wrapped present with a tag on it. */
+  /* Each gift is a capsule pill, wrapped like a present. */
   .gift-box {
     position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
-    min-height: min(132px, 19dvh);
-    padding: 20px 8px;
-    border-radius: 14px;
-    border: 1px solid rgba(255, 255, 255, 0.14);
-    box-shadow: 0 10px 22px rgba(0, 0, 0, 0.45), inset 0 2px 0 rgba(255, 255, 255, 0.18);
+    min-height: min(116px, 15dvh);
+    padding: 18px 24px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    box-shadow:
+      0 10px 22px rgba(0, 0, 0, 0.45),
+      inset 0 8px 10px -6px rgba(255, 255, 255, 0.45),
+      inset 0 -10px 14px -6px rgba(0, 0, 0, 0.45);
+  }
+  /*
+   * Like a real capsule, the right half is a second colour. Each wrapping is
+   * paired with another Christmas colour below.
+   */
+  .pill-half {
+    position: absolute;
+    inset: 0 0 0 50%;
+    border-radius: 0 999px 999px 0;
+    border-left: 2px solid rgba(0, 0, 0, 0.25);
+    box-shadow:
+      inset 0 8px 10px -6px rgba(255, 255, 255, 0.45),
+      inset 0 -10px 14px -6px rgba(0, 0, 0, 0.45);
+  }
+  .gift-red .pill-half { background: repeating-linear-gradient(45deg, #14562d 0 16px, #1d7a3a 16px 32px); }
+  .gift-green .pill-half { background: repeating-linear-gradient(45deg, #efe2cf 0 16px, #fff8ee 16px 32px); }
+  .gift-navy .pill-half { background: repeating-linear-gradient(45deg, #a50f2b 0 16px, #c4183a 16px 32px); }
+  .gift-candy .pill-half { background: repeating-linear-gradient(45deg, #14562d 0 16px, #1d7a3a 16px 32px); }
+  /* The glossy shine along the top. */
+  .pill-shine {
+    position: absolute;
+    top: 13%;
+    left: 7%;
+    width: 30%;
+    height: 7px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.55));
   }
   .gift-box::before,
   .gift-box::after {
     content: "";
     position: absolute;
+    z-index: 1;
     background: linear-gradient(90deg, #d39a1c, #ffe29a 50%, #d39a1c);
   }
   .gift-box::before {
@@ -359,8 +391,8 @@
     width: 18px;
   }
   .gift-box::after {
-    left: 0;
-    right: 0;
+    left: 3px;
+    right: 3px;
     top: calc(50% - 9px);
     height: 18px;
     background: linear-gradient(180deg, #d39a1c, #ffe29a 50%, #d39a1c);
@@ -371,19 +403,19 @@
   .gift-candy { background: repeating-linear-gradient(45deg, #fff0e0 0 16px, #d9304a 16px 32px); }
   .gift-tag {
     position: relative;
-    z-index: 1;
+    z-index: 2;
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 1px;
     width: 100%;
-    max-width: 250px;
+    max-width: min(250px, calc(100vw - 120px));
     padding: 11px 10px 12px;
     border-radius: 12px;
     background: var(--color-cream);
     color: var(--color-wine);
     font-weight: 800;
-    font-size: 1rem;
+    font-size: 1.05rem;
     line-height: 1.2;
     text-align: center;
     outline: 1.5px dashed rgba(74, 13, 28, 0.4);
