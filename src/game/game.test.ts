@@ -146,6 +146,53 @@ describe("tap", () => {
     expect(result.state.board.flat().some((t) => t.kind === "star")).toBe(false);
   });
 
+  it("sets off a star caught in a blast, with a bigger 5x5 blast", () => {
+    const board = boardOf((set) => {
+      set(1, 1, { color: -1, kind: "star" });
+      set(2, 2, { color: -1, kind: "star" });
+    });
+    const result = tap(stateWith(board), { row: 1, col: 1 }, seeded(11));
+    if (result.type !== "pop") throw new Error("expected a pop");
+    expect(result.effect).toBe("chain");
+    expect(result.blasts).toEqual([
+      { row: 1, col: 1, radius: 1, wave: 0 },
+      { row: 2, col: 2, radius: 2, wave: 1 },
+    ]);
+    // 3x3 around (1,1) joined with 5x5 around (2,2): rows 0-4, cols 0-4.
+    expect(result.poppedIds).toHaveLength(25);
+    // The second star pops in wave 1, when it goes off.
+    expect(result.waves.filter((w) => w === 1)).toHaveLength(17);
+    expect(result.state.board.flat().some((t) => t.kind === "star")).toBe(false);
+  });
+
+  it("keeps chaining through more stars", () => {
+    const board = boardOf((set) => {
+      set(0, 0, { color: -1, kind: "star" });
+      set(1, 1, { color: -1, kind: "star" });
+      set(3, 3, { color: -1, kind: "star" });
+      set(7, 6, { color: -1, kind: "star" });
+    });
+    const result = tap(stateWith(board), { row: 0, col: 0 }, seeded(12));
+    if (result.type !== "pop") throw new Error("expected a pop");
+    expect(result.blasts.map((b) => [b.row, b.col, b.wave])).toEqual([
+      [0, 0, 0],
+      [1, 1, 1],
+      [3, 3, 2],
+    ]);
+  });
+
+  it("leaves a star outside the blast alone", () => {
+    const board = boardOf((set) => {
+      set(3, 3, { color: -1, kind: "star" });
+      set(3, 6, { color: -1, kind: "star" });
+    });
+    const result = tap(stateWith(board), { row: 3, col: 3 }, seeded(13));
+    if (result.type !== "pop") throw new Error("expected a pop");
+    expect(result.effect).toBe("blast");
+    expect(result.blasts).toHaveLength(1);
+    expect(result.state.board[3][6].kind).toBe("star");
+  });
+
   it("never lets a goal go below zero", () => {
     const board = boardOf((set) => {
       set(0, 0, { color: 0 });

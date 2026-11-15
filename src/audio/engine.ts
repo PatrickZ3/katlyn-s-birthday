@@ -7,7 +7,19 @@ import { TUNES, tuneEvents } from "./tunes";
  * has run from a tap (see AudioUnlock).
  */
 
-export type Sfx = "tap" | "pop" | "shake" | "makeStar" | "blast" | "win" | "lose" | "gift";
+export type Sfx =
+  | "tap"
+  | "pop"
+  | "shake"
+  | "makeStar"
+  | "blast"
+  /** A star set off by another star: a deeper, bigger boom. */
+  | "chain"
+  | "win"
+  | "lose"
+  | "gift"
+  /** The big "you did it" for the end of the game: horns and sleigh bells. */
+  | "fanfare";
 
 const MUSIC_VOLUME = 0.32;
 const SFX_VOLUME = 0.8;
@@ -133,16 +145,42 @@ function arpeggio(notes: number[], gapSeconds: number, volume: number) {
   notes.forEach((hz, i) => bell(hz, now + i * gapSeconds, 0.6, volume, sfxBus));
 }
 
-function noiseBurst(seconds: number, volume: number) {
+/** A hiss of noise. `lowpassHz` makes it a deep rumble, `highpassHz` a bright shake. */
+function noiseBurst(
+  seconds: number,
+  volume: number,
+  { at = ctx!.currentTime, lowpassHz, highpassHz }: { at?: number; lowpassHz?: number; highpassHz?: number } = {},
+) {
   const source = ctx!.createBufferSource();
   const gain = ctx!.createGain();
-  const now = ctx!.currentTime;
   source.buffer = noise;
-  gain.gain.setValueAtTime(volume, now);
-  gain.gain.exponentialRampToValueAtTime(0.0001, now + seconds);
-  source.connect(gain).connect(sfxBus);
-  source.start(now);
-  source.stop(now + seconds);
+  gain.gain.setValueAtTime(0.0001, at);
+  gain.gain.exponentialRampToValueAtTime(volume, at + 0.005);
+  gain.gain.exponentialRampToValueAtTime(0.0001, at + seconds);
+  let node: AudioNode = source;
+  for (const [type, hz] of [["lowpass", lowpassHz], ["highpass", highpassHz]] as const) {
+    if (!hz) continue;
+    const filter = ctx!.createBiquadFilter();
+    filter.type = type;
+    filter.frequency.value = hz;
+    node = node.connect(filter);
+  }
+  node.connect(gain).connect(sfxBus);
+  source.start(at);
+  source.stop(at + seconds + 0.02);
+}
+
+/** One shake of sleigh bells. */
+function jingle(at: number, volume: number) {
+  noiseBurst(0.09, volume, { at, highpassHz: 7000 });
+  tone({ hz: 2637, at, seconds: 0.12, volume: volume * 0.5, out: sfxBus });
+  tone({ hz: 3520, at: at + 0.015, seconds: 0.1, volume: volume * 0.35, out: sfxBus });
+}
+
+/** A soft horn note: a triangle wave with a bell on top. */
+function horn(hz: number, at: number, seconds: number, volume: number) {
+  tone({ hz, at, seconds, volume, type: "triangle", out: sfxBus });
+  bell(hz, at, seconds * 1.2, volume * 0.8, sfxBus);
 }
 
 /** `size` is how many bubbles popped: bigger groups sound higher. */
@@ -165,6 +203,12 @@ export function playSfx(name: Sfx, size = 2): void {
     case "blast":
       noiseBurst(0.3, 0.3);
       return tone({ hz: 200, glideTo: 55, at, seconds: 0.35, volume: 0.5, out });
+    case "chain":
+      noiseBurst(0.7, 0.5, { lowpassHz: 1400 });
+      noiseBurst(0.25, 0.18);
+      tone({ hz: 150, glideTo: 32, at, seconds: 0.7, volume: 0.7, out });
+      tone({ hz: 75, glideTo: 30, at, seconds: 0.8, volume: 0.5, type: "triangle", out });
+      return arpeggio([1568, 2093, 2637], 0.05, 0.12);
     case "win":
       return arpeggio([523, 659, 784, 1047, 1319], 0.11, 0.32);
     case "lose":
@@ -172,5 +216,15 @@ export function playSfx(name: Sfx, size = 2): void {
     case "gift":
       noiseBurst(0.18, 0.1);
       return arpeggio([784, 988, 1175, 1568, 1976, 2349], 0.075, 0.28);
+    case "fanfare": {
+      // Da-da-da-DAAA, then a big chord with sleigh bells shaking under it.
+      [392, 523, 659].forEach((hz, i) => horn(hz, at + i * 0.13, 0.18, 0.2));
+      horn(784, at + 0.39, 0.3, 0.22);
+      horn(659, at + 0.6, 0.14, 0.16);
+      [523, 659, 784, 1047].forEach((hz) => horn(hz, at + 0.76, 1.6, 0.12));
+      tone({ hz: 131, at: at + 0.76, seconds: 1.4, volume: 0.25, type: "triangle", out });
+      for (let i = 0; i < 12; i++) jingle(at + 0.76 + i * 0.12, i % 2 ? 0.07 : 0.11);
+      return;
+    }
   }
 }

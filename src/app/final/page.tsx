@@ -9,21 +9,42 @@ import { ElementTiles } from "@/components/ElementTiles";
 import { useGame } from "@/components/GameProvider";
 import { Present } from "@/components/Present";
 import { PresentGlow } from "@/components/PresentGlow";
+import { fireConfetti, rainConfetti } from "@/components/Confetti";
 import { burstSparkles } from "@/components/Sparkles";
 import { config } from "@/config";
 
 const OPEN_MS = 760;
+/** When the present lands after popping in: the fanfare and confetti go off then. */
+const ENTRANCE_DELAY_S = 0.35;
+const CELEBRATE_MS = 650;
+
+function centerOf(element: Element | null) {
+  const rect = element?.getBoundingClientRect();
+  return rect ? { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 } : undefined;
+}
 
 export default function FinalPage() {
   const { final, name } = config;
   const router = useRouter();
   const { playAgain } = useGame();
   const [opening, setOpening] = useState(false);
+  const [landed, setLanded] = useState(false);
   const openTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
+  const present = useRef<HTMLButtonElement>(null);
 
+  // The present pops in, then the fanfare plays and confetti flies everywhere.
   useEffect(() => {
     burstSparkles(200);
-    return () => clearTimeout(openTimer.current);
+    const celebrate = setTimeout(() => {
+      setLanded(true);
+      playSfx("fanfare");
+      fireConfetti(150, centerOf(present.current));
+      rainConfetti(110);
+    }, CELEBRATE_MS);
+    return () => {
+      clearTimeout(celebrate);
+      clearTimeout(openTimer.current);
+    };
   }, []);
 
   const openPresent = () => {
@@ -31,6 +52,7 @@ export default function FinalPage() {
     setOpening(true);
     playSfx("gift");
     burstSparkles(160);
+    fireConfetti(120, centerOf(present.current));
     openTimer.current = setTimeout(() => router.push("/gift"), OPEN_MS);
   };
 
@@ -56,7 +78,24 @@ export default function FinalPage() {
         <PresentGlow opening={opening} />
         <RoundBuddy className="pointer-events-none absolute bottom-[6%] left-[3%] z-10 w-[54px]" />
         <GlowBuddy className="pointer-events-none absolute right-[6%] bottom-[6%] z-10 w-[38px]" />
+        {/* A ring of light bursts out when the present lands. */}
+        {landed && (
+          <motion.span
+            aria-hidden
+            className="blast-ring pointer-events-none absolute top-1/2 left-1/2 z-10 aspect-square w-[min(58vw,31dvh,270px)] -translate-1/2"
+            initial={{ scale: 0.4, opacity: 1 }}
+            animate={{ scale: 2.4, opacity: 0 }}
+            transition={{ duration: 0.9, ease: "easeOut" }}
+          />
+        )}
+        <motion.div
+          className="relative z-10"
+          initial={{ scale: 0, y: 70, rotate: -14 }}
+          animate={{ scale: 1, y: 0, rotate: 0 }}
+          transition={{ type: "spring", stiffness: 260, damping: 11, delay: ENTRANCE_DELAY_S }}
+        >
         <motion.button
+          ref={present}
           data-own-sound
           aria-label={final.presentLabel}
           className="relative z-10 aspect-[200/210] w-[min(58vw,31dvh,270px)]"
@@ -67,6 +106,7 @@ export default function FinalPage() {
         >
           <Present opening={opening} />
         </motion.button>
+        </motion.div>
       </div>
 
       <div className="relative z-10 flex flex-col items-center gap-[min(10px,1.6dvh)]">

@@ -1,7 +1,7 @@
 import {
   MIN_GROUP,
   STAR_SIZE,
-  blastArea,
+  blastChain,
   createBoard,
   createTileMaker,
   findGroup,
@@ -10,7 +10,7 @@ import {
   shuffleBoard,
 } from "./board";
 import { LEVELS } from "./levels";
-import type { Cell, GameState, Goals, Rng, TapResult } from "./types";
+import type { Cell, GameState, Goals, PoppedCell, Rng, TapResult } from "./types";
 
 export function isLastLevel(levelIndex: number): boolean {
   return levelIndex === LEVELS.length - 1;
@@ -37,7 +37,10 @@ export function tap(state: GameState, cell: Cell, rng: Rng = Math.random): TapRe
   if (!tile) return { type: "ignored" };
 
   const isStar = tile.kind === "star";
-  const cells = isStar ? blastArea(cell) : findGroup(state.board, cell);
+  const chain = isStar ? blastChain(state.board, cell) : null;
+  const cells: PoppedCell[] = chain
+    ? chain.cells
+    : findGroup(state.board, cell).map((c) => ({ ...c, wave: 0 }));
   if (!isStar && cells.length < MIN_GROUP) return { type: "shake", tileId: tile.id };
 
   const goals: Goals = { ...state.goals };
@@ -50,10 +53,13 @@ export function tap(state: GameState, cell: Cell, rng: Rng = Math.random): TapRe
   const makesStar = !isStar && cells.length >= STAR_SIZE;
   const board = popAndRefill(state.board, cells, makesStar ? cell : null, tiles);
 
+  const blasts = chain?.blasts ?? [];
   return {
     type: "pop",
-    effect: isStar ? "blast" : makesStar ? "makeStar" : "pop",
+    effect: blasts.length > 1 ? "chain" : isStar ? "blast" : makesStar ? "makeStar" : "pop",
     poppedIds: popped.map((t) => t.id),
+    waves: cells.map((c) => c.wave),
+    blasts,
     state: { ...state, board, goals, moves: state.moves - 1, nextTileId: tiles.nextId() },
   };
 }

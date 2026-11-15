@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Great_Vibes, Nunito } from "next/font/google";
 import type { ReactNode } from "react";
 import { AudioUnlock } from "@/components/AudioUnlock";
+import { Confetti } from "@/components/Confetti";
 import { FairyLights } from "@/components/FairyLights";
 import { GameProvider } from "@/components/GameProvider";
 import { Menu } from "@/components/Menu";
@@ -49,6 +50,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             <Santa />
             <Sparkles />
             <FairyLights />
+            <Confetti />
             <Menu />
             {/* Clips big background effects so the page can never scroll or wobble. */}
             <div className="fixed inset-0 z-2 overflow-hidden">

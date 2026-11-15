@@ -175,6 +175,43 @@
     box-shadow: 0 0 40px rgba(196, 24, 58, 0.35);
   }
 
+  /* Landing page: a warm glow behind the photo. */
+  .photo-aura {
+    position: absolute;
+    inset: -14%;
+    border-radius: 9999px;
+    background: radial-gradient(circle, rgba(255, 214, 120, 0.42) 0%, rgba(232, 51, 79, 0.22) 45%, transparent 70%);
+    animation: halo 2.8s ease-in-out infinite alternate;
+    pointer-events: none;
+  }
+
+  /* Her name in gold, with a gleam of light sweeping across it now and then. */
+  .shimmer-gold {
+    display: inline-block;
+    padding: 0 0.2em;
+    color: transparent;
+    background: linear-gradient(100deg, #f3c969 0%, #f3c969 40%, #fff6dc 50%, #f3c969 60%, #f3c969 100%) 0 0 / 300% 100%;
+    background-clip: text;
+    -webkit-background-clip: text;
+    text-shadow: none;
+    filter: drop-shadow(0 0 10px rgba(243, 201, 105, 0.45));
+    animation: shimmer 4s ease-in-out infinite;
+  }
+
+  /* A glint of light that runs across the button every few seconds. */
+  .btn-shine {
+    isolation: isolate;
+  }
+  .btn-shine::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    background: linear-gradient(105deg, transparent 35%, rgba(255, 255, 255, 0.45) 50%, transparent 65%) -150% 0 / 250% 100% no-repeat;
+    animation: shine 3.2s ease-in-out infinite;
+  }
+
   .script-title {
     font-family: var(--font-script);
     line-height: 1.05;
@@ -423,11 +460,37 @@
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
   }
 
+  /* Star blasts on the game board. */
+  .blast-flash {
+    border-radius: 9999px;
+    background: radial-gradient(circle, #fffbe8 0%, rgba(255, 214, 120, 0.9) 30%, rgba(255, 120, 60, 0.45) 55%, transparent 72%);
+    mix-blend-mode: screen;
+  }
+  .blast-ring {
+    border-radius: 9999px;
+    border: 3px solid #ffe29a;
+    box-shadow: 0 0 14px rgba(255, 214, 120, 0.9), inset 0 0 12px rgba(255, 214, 120, 0.7);
+  }
+  .blast-ring-big {
+    border-width: 5px;
+    border-color: #fff3d0;
+    box-shadow: 0 0 24px rgba(255, 170, 80, 1), inset 0 0 18px rgba(255, 214, 120, 0.9);
+  }
+
   .color-0 { background: radial-gradient(circle at 35% 30%, #ff7a8a, #c4183a 70%); }
   .color-1 { background: radial-gradient(circle at 35% 30%, #8ff0a6, #1d7a3a 70%); }
   .color-2 { background: radial-gradient(circle at 35% 30%, #fff0b0, #d39a1c 70%); }
   .color-3 { background: radial-gradient(circle at 35% 30%, #a6d8ff, #1f5fae 70%); }
   .color-4 { background: radial-gradient(circle at 35% 30%, #e2b8ff, #6b2fa8 70%); }
+}
+
+@keyframes shimmer {
+  0%, 35% { background-position: 100% 0; }
+  75%, 100% { background-position: 0% 0; }
+}
+@keyframes shine {
+  0%, 55% { background-position: 150% 0; }
+  100% { background-position: -150% 0; }
 }
 
 @keyframes santa-fly {

@@ -13,19 +13,35 @@ import {
 } from "react";
 import { playSfx } from "@/audio/engine";
 import { isLastLevel, settle, startLevel, tap } from "@/game/game";
-import type { Board, Cell, GameState } from "@/game/types";
+import type { Blast, Board, Cell, GameState, PopEffect } from "@/game/types";
 import { loadLevel, saveLevel } from "@/lib/progress";
+import { fireConfetti } from "./Confetti";
 import { burstSparkles } from "./Sparkles";
 
 const POP_MS = 220;
 const FALL_MS = 360;
 const FINALE_DELAY_MS = 600;
+/** The gap between one star going off and the next one in a chain. */
+export const CHAIN_WAVE_MS = 260;
+
+/** What the board should show for the last move: shockwaves, a new star, and so on. */
+export type MoveFx = {
+  /** New for every move, so the board replays its effects. */
+  id: number;
+  effect: PopEffect;
+  blasts: Blast[];
+  /** Where she tapped. */
+  cell: Cell;
+};
 
 type GameContextValue = {
   game: GameState | null;
   /** What's on screen. Trails `game.board` while tiles are popping. */
   shownBoard: Board;
   poppingIds: ReadonlySet<number>;
+  /** Tile id -> which chain wave it pops in. Missing means wave 0. */
+  popWaves: ReadonlyMap<number, number>;
+  fx: MoveFx | null;
   shake: { tileId: number; nonce: number } | null;
   /** Changes on every fresh board, so the board can skip its entrance animation. */
   attempt: number;
@@ -46,6 +62,7 @@ export function useGame() {
 }
 
 const NO_IDS: ReadonlySet<number> = new Set();
+const NO_WAVES: ReadonlyMap<number, number> = new Map();
 
 /** Runs the plain-TypeScript game on a timer so pops and falls can be seen. */
 export function GameProvider({ children }: { children: ReactNode }) {
@@ -53,6 +70,9 @@ export function GameProvider({ children }: { children: ReactNode }) {
   const [game, setGame] = useState<GameState | null>(null);
   const [shownBoard, setShownBoard] = useState<Board>([]);
   const [poppingIds, setPoppingIds] = useState(NO_IDS);
+  const [popWaves, setPopWaves] = useState(NO_WAVES);
+  const [fx, setFx] = useState<MoveFx | null>(null);
+  const fxId = useRef(0);
   const [shake, setShake] = useState<GameContextValue["shake"]>(null);
   const [attempt, setAttempt] = useState(0);
 
@@ -75,6 +95,8 @@ export function GameProvider({ children }: { children: ReactNode }) {
       show(next);
       setShownBoard(next.board);
       setPoppingIds(NO_IDS);
+      setPopWaves(NO_WAVES);
+      setFx(null);
       setShake(null);
       setAttempt((n) => n + 1);
     },
@@ -93,6 +115,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
     if (next.status === "won") {
       playSfx("win");
       burstSparkles(80);
+      fireConfetti(70, { x: window.innerWidth / 2, y: window.innerHeight * 0.45 });
       if (isLastLevel(next.levelIndex)) {
         saveLevel(0);
         timers.current.push(setTimeout(() => router.replace("/final"), FINALE_DELAY_MS));
@@ -116,16 +139,27 @@ export function GameProvider({ children }: { children: ReactNode }) {
       if (result.type !== "pop") return;
 
       busy.current = true;
-      playSfx(result.effect, result.poppedIds.length);
       show(result.state);
       setPoppingIds(new Set(result.poppedIds));
-      timers.current = [
+      setPopWaves(new Map(result.poppedIds.map((id, i) => [id, result.waves[i]])));
+      setFx({ id: ++fxId.current, effect: result.effect, blasts: result.blasts, cell });
+
+      // Each wave of a chain booms a little after the last one.
+      const lastWave = Math.max(0, ...result.waves);
+      const chainMs = lastWave * CHAIN_WAVE_MS;
+      if (result.blasts.length === 0) playSfx(result.effect, result.poppedIds.length);
+      const sounds = new Set(result.blasts.map((b) => b.wave));
+      timers.current = [...sounds].map((wave) =>
+        setTimeout(() => playSfx(wave === 0 ? "blast" : "chain"), wave * CHAIN_WAVE_MS),
+      );
+      timers.current.push(
         setTimeout(() => {
           setShownBoard(result.state.board);
           setPoppingIds(NO_IDS);
-        }, POP_MS),
-        setTimeout(finishMove, POP_MS + FALL_MS),
-      ];
+          setPopWaves(NO_WAVES);
+        }, POP_MS + chainMs),
+        setTimeout(finishMove, POP_MS + chainMs + FALL_MS),
+      );
     },
     [finishMove, show],
   );
@@ -135,6 +169,8 @@ export function GameProvider({ children }: { children: ReactNode }) {
       game,
       shownBoard,
       poppingIds,
+      popWaves,
+      fx,
       shake,
       attempt,
       tapCell,
@@ -150,7 +186,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
         begin(0);
       },
     }),
-    [attempt, begin, game, poppingIds, shake, shownBoard, tapCell],
+    [attempt, begin, fx, game, popWaves, poppingIds, shake, shownBoard, tapCell],
   );
 
   return <GameContext.Provider value={value}>{children}</GameContext.Provider>;

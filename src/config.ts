@@ -211,7 +211,7 @@ export const config = {
     title: "A gift is waiting",
     body: "Beat **level 5** to unlock your next gift.",
     howToPlay:
-      "Tap groups of 2 or more matching bubbles to pop them. Pop 6 or more at once to make a ★ star, then tap it to blast everything around it. (Kalo mager bisa skip look at top right)",
+      "Tap groups of 2 or more matching bubbles to pop them. Pop 6 or more at once to make a ★ star, then tap it to blast everything around it. If a blast hits another star, that one goes off too, even bigger. (Kalo mager bisa skip look at top right)",
     button: "Ok Bro",
   },
 

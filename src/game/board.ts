@@ -1,4 +1,4 @@
-import type { Board, Cell, Rng, Tile } from "./types";
+import type { Blast, Board, Cell, PoppedCell, Rng, Tile } from "./types";
 
 export const COLS = 7;
 export const ROWS = 8;
@@ -6,6 +6,9 @@ export const ROWS = 8;
 export const STAR_SIZE = 6;
 /** The smallest group that can be popped. */
 export const MIN_GROUP = 2;
+/** A tapped star clears 3x3 (radius 1). A star set off by another blast clears 5x5. */
+export const STAR_RADIUS = 1;
+export const CHAIN_RADIUS = 2;
 
 /** Hands out new tiles with increasing ids. */
 export type TileMaker = {
@@ -88,15 +91,42 @@ export function findGroup(board: Board, start: Cell): Cell[] {
   return group;
 }
 
-/** The 3x3 area a star at `center` clears, trimmed at the board edges. */
-export function blastArea({ row, col }: Cell): Cell[] {
+/** The square a star at `center` clears (3x3 for radius 1), trimmed at the board edges. */
+export function blastArea({ row, col }: Cell, radius = STAR_RADIUS): Cell[] {
   const cells: Cell[] = [];
-  for (let y = row - 1; y <= row + 1; y++) {
-    for (let x = col - 1; x <= col + 1; x++) {
+  for (let y = row - radius; y <= row + radius; y++) {
+    for (let x = col - radius; x <= col + radius; x++) {
       if (y >= 0 && y < ROWS && x >= 0 && x < COLS) cells.push({ row: y, col: x });
     }
   }
   return cells;
+}
+
+/**
+ * Sets off the star at `start`. Any other star caught in a blast goes off
+ * too, one wave later, with a bigger blast, and so on down the chain.
+ * Every cleared cell comes with the wave it pops in, so the display can
+ * ripple the chain outwards.
+ */
+export function blastChain(board: Board, start: Cell): { cells: PoppedCell[]; blasts: Blast[] } {
+  const key = ({ row, col }: Cell) => row * COLS + col;
+  const popped = new Map<number, PoppedCell>([[key(start), { ...start, wave: 0 }]]);
+  const blasts: Blast[] = [];
+  const queue: Blast[] = [{ ...start, radius: STAR_RADIUS, wave: 0 }];
+
+  while (queue.length > 0) {
+    const blast = queue.shift()!;
+    blasts.push(blast);
+    for (const cell of blastArea(blast, blast.radius)) {
+      if (popped.has(key(cell))) continue;
+      const isStar = board[cell.row][cell.col].kind === "star";
+      // A caught star pops when it goes off, one wave later.
+      const wave = isStar ? blast.wave + 1 : blast.wave;
+      popped.set(key(cell), { ...cell, wave });
+      if (isStar) queue.push({ ...cell, radius: CHAIN_RADIUS, wave });
+    }
+  }
+  return { cells: [...popped.values()], blasts };
 }
 
 /**

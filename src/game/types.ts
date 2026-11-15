@@ -12,6 +12,12 @@ export type Tile = {
 
 export type Cell = { row: number; col: number };
 
+/** One star going off. `wave` 0 is the tapped star; each chained star is one wave later. */
+export type Blast = Cell & { radius: number; wave: number };
+
+/** A cleared cell, and the wave it pops in. */
+export type PoppedCell = Cell & { wave: number };
+
 /** board[row][col]; row 0 is the top. */
 export type Board = Tile[][];
 
@@ -36,12 +42,24 @@ export type GameState = {
   nextTileId: number;
 };
 
-/** What a pop did, so the display can react: a plain pop, a new star, or a star going off. */
-export type PopEffect = "pop" | "makeStar" | "blast";
+/**
+ * What a pop did, so the display can react: a plain pop, a new star, a star
+ * going off, or a star setting off other stars.
+ */
+export type PopEffect = "pop" | "makeStar" | "blast" | "chain";
 
 export type TapResult =
   | { type: "ignored" }
   /** A lone bubble: nothing pops and no move is used. */
   | { type: "shake"; tileId: number }
   /** `state` has the tiles removed and the board refilled. Call `settle` once it has landed. */
-  | { type: "pop"; effect: PopEffect; poppedIds: number[]; state: GameState };
+  | {
+      type: "pop";
+      effect: PopEffect;
+      poppedIds: number[];
+      /** The wave each popped tile goes in, matching `poppedIds`. All 0 unless stars chain. */
+      waves: number[];
+      /** Every star that went off, in order. Empty for a plain pop. */
+      blasts: Blast[];
+      state: GameState;
+    };
