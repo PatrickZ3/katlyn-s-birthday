@@ -98,7 +98,7 @@ const gift: { title: string; showRx: boolean; types: GiftType[] } = {
       label: "Daily",
       icon: "⛄",
       dose: "Take once daily, with love.",
-      items: ["A photoshoot", "Harass-me session", "I'll say anything you want"],
+      items: ["Cooked meal by me :D", "Harass-me session", "I'll say anything you want"],
     },
     {
       label: "Weekly",
@@ -235,6 +235,29 @@ export const config = {
 
   levels: {
     title: "Pick a level",
+  },
+
+  /** The 3D walk around Toronto (Bay to Yonge, College to Queen). */
+  explore: {
+    menuLabel: "🗺️ Explore Toronto",
+    loading: "Building Toronto... ❄",
+    failed: "This phone couldn't load the 3D city. Try opening it in Safari or Chrome.",
+    hint: "Use the stick to walk. Stop, then drag to look around. Tap the 📍 to open the map.",
+    mapTitle: "Tap anywhere to go there",
+    mapClose: "Close",
+    /**
+     * Where she lives. She starts here, and there's a sign out front.
+     * OpenStreetMap doesn't list 711 Bay, so this spot is worked out from the
+     * street numbers next to it (717 Bay is just north). To move it: in Google
+     * Maps, right-click the exact spot, click the numbers at the top to copy
+     * them, and paste them in as lat and lon.
+     */
+    home: {
+      sign: "711 Bay Street",
+      label: "🏠 Katlyn's home",
+      lat: 43.658732,
+      lon: -79.384807,
+    },
   },
 
   /**

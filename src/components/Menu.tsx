@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { isMuted, setMuted } from "@/audio/engine";
 import { useEffect, useRef, useState } from "react";
+import { config } from "@/config";
 import { useGame } from "./GameProvider";
 
 const edge = "right-[max(12px,calc(50%-228px))]";
@@ -38,6 +39,7 @@ export function Menu() {
     },
     { label: "🎄 Pick a level", run: () => router.push("/levels") },
     { label: "🧸 Cute stuff", run: () => router.push("/cute") },
+    { label: config.explore.menuLabel, run: () => router.push("/explore") },
     { label: "🎁 Unlock gift", run: () => router.push("/final") },
     {
       label: muted ? "🔊 Turn sound on" : "🔇 Turn sound off",

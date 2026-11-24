@@ -12,7 +12,7 @@ const PINES = [
 ];
 
 /** No scene here: these pages have their own backdrop, or scroll over the same spot. */
-const PAGES_WITHOUT_SCENE = ["/note", "/final", "/cute"];
+const PAGES_WITHOUT_SCENE = ["/note", "/final", "/cute", "/explore"];
 
 function Pine({ x, y, size }: { x: number; y: number; size: number }) {
   return (

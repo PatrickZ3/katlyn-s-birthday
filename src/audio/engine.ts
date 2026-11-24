@@ -19,7 +19,9 @@ export type Sfx =
   | "lose"
   | "gift"
   /** The big "you did it" for the end of the game: horns and sleigh bells. */
-  | "fanfare";
+  | "fanfare"
+  /** A soft crunch of a footstep in snow. */
+  | "step";
 
 const MUSIC_VOLUME = 0.32;
 const SFX_VOLUME = 0.8;
@@ -216,6 +218,8 @@ export function playSfx(name: Sfx, size = 2): void {
     case "gift":
       noiseBurst(0.18, 0.1);
       return arpeggio([784, 988, 1175, 1568, 1976, 2349], 0.075, 0.28);
+    case "step":
+      return noiseBurst(0.07, 0.07, { lowpassHz: 1100 });
     case "fanfare": {
       // Da-da-da-DAAA, then a big chord with sleigh bells shaking under it.
       [392, 523, 659].forEach((hz, i) => horn(hz, at + i * 0.13, 0.18, 0.2));
