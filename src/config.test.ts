@@ -67,3 +67,12 @@ describe("cute stuff page in config.ts", () => {
     check(new Set(ids).size === ids.length, "two stickers have the same drawing and the same name.");
   });
 });
+
+describe("letter in config.ts", () => {
+  it("stays within the word limit", () => {
+    const { opening, body, signOff, ps } = config.letter;
+    const words = [opening, body, signOff, ps].join(" ").split(/\s+/).filter(Boolean).length;
+    check(words <= LIMITS.letterWords, `the letter is ${words} words. The maximum is ${LIMITS.letterWords}.`);
+    check(body.trim().length > 0, "the letter body is empty.");
+  });
+});

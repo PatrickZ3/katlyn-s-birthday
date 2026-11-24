@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { playSfx } from "@/audio/engine";
 import { GlowBuddy, RoundBuddy } from "@/components/Doodles";
+import { Letter } from "@/components/Letter";
 import { ElementTiles } from "@/components/ElementTiles";
 import { useGame } from "@/components/GameProvider";
 import { Present } from "@/components/Present";
@@ -13,7 +14,6 @@ import { fireConfetti, rainConfetti } from "@/components/Confetti";
 import { burstSparkles } from "@/components/Sparkles";
 import { config } from "@/config";
 
-const OPEN_MS = 760;
 /** When the present lands after popping in: the fanfare and confetti go off then. */
 const ENTRANCE_DELAY_S = 0.35;
 const CELEBRATE_MS = 650;
@@ -29,7 +29,7 @@ export default function FinalPage() {
   const { playAgain } = useGame();
   const [opening, setOpening] = useState(false);
   const [landed, setLanded] = useState(false);
-  const openTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
+  const [reading, setReading] = useState(false);
   const present = useRef<HTMLButtonElement>(null);
 
   // The present pops in, then the fanfare plays and confetti flies everywhere.
@@ -43,7 +43,6 @@ export default function FinalPage() {
     }, CELEBRATE_MS);
     return () => {
       clearTimeout(celebrate);
-      clearTimeout(openTimer.current);
     };
   }, []);
 
@@ -53,7 +52,9 @@ export default function FinalPage() {
     playSfx("gift");
     burstSparkles(160);
     fireConfetti(120, centerOf(present.current));
-    openTimer.current = setTimeout(() => router.push("/gift"), OPEN_MS);
+    // The letter opens straight away, over the present. Closing it goes on
+    // to the gifts.
+    setReading(true);
   };
 
   return (
@@ -123,6 +124,7 @@ export default function FinalPage() {
           {final.button}
         </button>
       </div>
+      <Letter open={reading} onClose={() => router.push("/gift")} />
     </section>
   );
 }

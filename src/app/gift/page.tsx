@@ -5,6 +5,7 @@ import { useState } from "react";
 import { Bow } from "@/components/Bow";
 import { Capsule } from "@/components/Doodles";
 import { Holly } from "@/components/Holly";
+import { Letter } from "@/components/Letter";
 import { RxMark } from "@/components/RxMark";
 import { SnowCap } from "@/components/SnowCap";
 import { config } from "@/config";
@@ -19,9 +20,10 @@ export default function GiftPage() {
   const { title, showRx, types } = config.gift;
   const [activeTab, setActiveTab] = useState(0);
   const active = types[activeTab];
+  const [reading, setReading] = useState(false);
 
   return (
-    <section className="flex h-full w-full flex-col items-center">
+    <section className="relative flex h-full w-full flex-col items-center">
       <div className="flex shrink-0 items-center gap-3">
         <Capsule className="w-10 -rotate-[24deg]" />
         <h1 className="script-title pb-2 text-[2.8rem] text-gold">{title}</h1>
@@ -95,6 +97,11 @@ export default function GiftPage() {
           ))}
         </motion.ul>
       </AnimatePresence>
+
+      <button className="btn-quiet letter-reopen" onClick={() => setReading(true)}>
+        {config.letter.button}
+      </button>
+      <Letter open={reading} onClose={() => setReading(false)} />
     </section>
   );
 }

@@ -26,6 +26,7 @@ export const LIMITS = {
   cuteStickers: 24,
   cuteNameLength: 24,
   cuteNoteLength: 60,
+  letterWords: 200,
 };
 
 type GiftType = {
@@ -168,7 +169,7 @@ const cuteStuff: { title: string; sections: CuteSection[] } = {
       ],
     },
     {
-      title: "She's goes to the lab 👀",
+      title: "She goes to the lab 👀",
       stickers: [
         {
           sticker: "elements",
@@ -231,6 +232,24 @@ export const config = {
     button: "Main lagi?",
     presentHint: "Pencet for your present sayang",
     presentLabel: "Open your present",
+  },
+
+  /**
+   * THE LETTER
+   * Opens by itself when she taps the present on the final page. On the
+   * gifts page, a small button opens it again.
+   *   - Up to 200 words in `body` (80 to 150 fits on one screen).
+   *   - Put a blank line between paragraphs: write \n\n inside the quotes.
+   *   - A single \n starts a new line, like in the sign-off.
+   */
+  letter: {
+    button: "💌 Letter",
+    opening: "Hallo sayangg!",
+    body: "Merry christmas yahhh! I wanted to make a long ahh letter for you but I think I'll keep it for new years :DD I wish you and your family a fun and happy christmass. udh gitu ajaaa byee have funn kaliannn",
+    signOff: "Love,\nPatrick",
+    /** Shown under the sign-off. Leave it as "" to hide it. */
+    ps: "P.s. I hope you like your christmas gifts hehe",
+    close: "Close",
   },
 
   levels: {

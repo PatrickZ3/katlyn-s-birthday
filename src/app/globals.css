@@ -744,3 +744,129 @@
     animation-iteration-count: 1 !important;
   }
 }
+
+/* Final page: the letter. */
+.letter-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: max(20px, env(safe-area-inset-top)) 16px max(20px, env(safe-area-inset-bottom));
+  background: rgba(10, 3, 6, 0.72);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+}
+.letter-paper {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: min(100%, 420px);
+  max-height: 100%;
+  padding: 30px 22px 18px;
+  border-radius: 6px;
+  color: #3a1a14;
+  background:
+    repeating-linear-gradient(180deg, transparent 0 31px, rgba(196, 24, 58, 0.12) 31px 32px),
+    linear-gradient(180deg, #fff8ec, #f7e6cc);
+  border: 6px solid transparent;
+  border-image: repeating-linear-gradient(45deg, #c4183a 0 10px, #fff 10px 20px, #1d7a3a 20px 30px, #fff 30px 40px) 6;
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.55);
+  transform-origin: top center;
+}
+.letter-stamp {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  font-size: 1.6rem;
+  transform: rotate(8deg);
+}
+.letter-scroll {
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  text-align: left;
+}
+.letter-opening {
+  font-family: var(--font-script);
+  font-size: 2.3rem;
+  line-height: 1.2;
+  color: #a10f2c;
+  margin-bottom: 10px;
+}
+.letter-body {
+  font-size: 1.05rem;
+  font-weight: 700;
+  line-height: 32px;
+  margin-bottom: 14px;
+  white-space: pre-line;
+}
+.letter-signoff {
+  font-family: var(--font-script);
+  font-size: 1.9rem;
+  line-height: 1.15;
+  color: #a10f2c;
+  text-align: right;
+  white-space: pre-line;
+  margin: 4px 6px 8px 0;
+}
+/* A red ribbon button with a gold wax-seal heart. */
+.letter-close {
+  position: relative;
+  align-self: center;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 12px;
+  padding: 8px 26px 8px 8px;
+  border-radius: 999px;
+  font-weight: 800;
+  font-size: 1rem;
+  letter-spacing: 0.04em;
+  color: var(--color-cream);
+  background: linear-gradient(180deg, #e8334f, #a10f2c);
+  border: 2px solid var(--color-gold);
+  box-shadow: 0 6px 16px rgba(161, 15, 44, 0.35), inset 0 2px 0 rgba(255, 255, 255, 0.25);
+  transition: transform 0.12s;
+}
+.letter-close::after {
+  /* Stitching just inside the edge, like a ribbon. */
+  content: "";
+  position: absolute;
+  inset: 3px;
+  border: 1.5px dashed rgba(255, 243, 230, 0.45);
+  border-radius: inherit;
+  pointer-events: none;
+}
+.letter-close:active {
+  transform: scale(0.94);
+}
+.letter-close-seal {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  font-size: 0.8rem;
+  color: #a10f2c;
+  background: radial-gradient(circle at 35% 30%, #ffe6a3, #f3c969 55%, #c9962e);
+  box-shadow: inset 0 -2px 3px rgba(0, 0, 0, 0.2);
+}
+.letter-ps {
+  font-size: 0.95rem;
+  font-weight: 700;
+  font-style: italic;
+  margin: 6px 0 4px;
+  opacity: 0.85;
+}
+.letter-reopen {
+  position: absolute;
+  bottom: max(10px, calc(min(15dvh, 120px) - 62px));
+  left: 50%;
+  z-index: 30;
+  translate: -50% 0;
+  padding: 6px 16px;
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
