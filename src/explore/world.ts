@@ -2,7 +2,8 @@ import * as THREE from "three";
 import { SHOP_HEIGHT, addBuildings } from "./buildings";
 import { addLandmarks } from "./landmarks";
 import { addStorefronts } from "./storefronts";
-import { insidePolygon, type MapData } from "./geo";
+import { type Collider, insidePolygon, type MapData } from "./geo";
+import { addStreetFurniture } from "./street";
 
 /**
  * Builds the 3D city from the map data: snowy ground, streets, buildings with
@@ -281,7 +282,7 @@ export type Home = { x: number; z: number; sign: string; label: string };
  * `map` is already shrunk by `scale`. People-sized things (signs, trees)
  * stay full size; only the city is shrunk.
  */
-export function buildWorld(map: MapData, scale: number, home: Home): World {
+export function buildWorld(map: MapData, scale: number, home: Home, collider: Collider): World {
   const group = new THREE.Group();
   const disposables: { dispose: () => void }[] = [];
   const keep = <T extends { dispose: () => void }>(thing: T) => (disposables.push(thing), thing);
@@ -420,6 +421,11 @@ export function buildWorld(map: MapData, scale: number, home: Home): World {
   }
 
   group.add(homeSign(map, home, keep));
+
+  // Lamp posts, bins, benches, planters and café tables on the sidewalks.
+  const street = addStreetFurniture(map, scale, collider, [home.x, home.z]);
+  group.add(street.group);
+  disposables.push(street);
 
   return {
     group,

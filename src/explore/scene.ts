@@ -171,7 +171,7 @@ export function startExplore(container: HTMLElement, options: ExploreOptions): E
   const [hx, hz] = project(options.map, options.home.lat, options.home.lon);
   const home = collider.nearestFree(hx * MAP_SCALE, hz * MAP_SCALE, 1.6) ?? map.spawn;
 
-  const world = buildWorld(map, MAP_SCALE, { x: home[0], z: home[1], sign: options.home.sign, label: options.home.label });
+  const world = buildWorld(map, MAP_SCALE, { x: home[0], z: home[1], sign: options.home.sign, label: options.home.label }, collider);
   scene.add(world.group);
 
   const katlyn = createCharacter();

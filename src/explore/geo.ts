@@ -117,23 +117,26 @@ export class Collider {
 
   constructor(buildings: number[][], walk: [number, number][]) {
     this.walk = walk.flat();
-    for (const flat of buildings) {
-      let minX = Infinity;
-      let maxX = -Infinity;
-      let minZ = Infinity;
-      let maxZ = -Infinity;
-      for (let i = 0; i < flat.length; i += 2) {
-        minX = Math.min(minX, flat[i]);
-        maxX = Math.max(maxX, flat[i]);
-        minZ = Math.min(minZ, flat[i + 1]);
-        maxZ = Math.max(maxZ, flat[i + 1]);
-      }
-      for (let gx = Math.floor(minX / CELL); gx <= Math.floor(maxX / CELL); gx++) {
-        for (let gz = Math.floor(minZ / CELL); gz <= Math.floor(maxZ / CELL); gz++) {
-          const key = `${gx},${gz}`;
-          if (!this.grid.has(key)) this.grid.set(key, []);
-          this.grid.get(key)!.push(flat);
-        }
+    for (const flat of buildings) this.add(flat);
+  }
+
+  /** Makes an outline solid, so she walks around it. Used for buildings and street furniture. */
+  add(flat: number[]) {
+    let minX = Infinity;
+    let maxX = -Infinity;
+    let minZ = Infinity;
+    let maxZ = -Infinity;
+    for (let i = 0; i < flat.length; i += 2) {
+      minX = Math.min(minX, flat[i]);
+      maxX = Math.max(maxX, flat[i]);
+      minZ = Math.min(minZ, flat[i + 1]);
+      maxZ = Math.max(maxZ, flat[i + 1]);
+    }
+    for (let gx = Math.floor(minX / CELL); gx <= Math.floor(maxX / CELL); gx++) {
+      for (let gz = Math.floor(minZ / CELL); gz <= Math.floor(maxZ / CELL); gz++) {
+        const key = `${gx},${gz}`;
+        if (!this.grid.has(key)) this.grid.set(key, []);
+        this.grid.get(key)!.push(flat);
       }
     }
   }

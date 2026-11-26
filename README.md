@@ -41,6 +41,12 @@ streets between Bay and Yonge, from College down to Queen.
 - Real street-level shops and restaurants get signs styled for what they are
   (Korean writing on Korean places, a döner spit at kebab shops, lanterns at
   Chinese places...). The styles are in `themeFor` in `src/explore/themes.ts`.
+- Buildings come in seven wall styles, each in two versions, in
+  `src/explore/buildings.ts`. Where OpenStreetMap only describes some pieces of
+  a building, the rest is filled in so there are no holes.
+- Lamp posts, bins, benches, planters and café tables line the sidewalks, and
+  she walks around them. They're in `src/explore/street.ts`; `SPACING` there
+  sets how many there are.
 - The words on the page are in `explore` in `src/config.ts`.
 
 Map data © OpenStreetMap contributors, available under the Open Database
